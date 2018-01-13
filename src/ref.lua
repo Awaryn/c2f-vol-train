@@ -106,34 +106,40 @@ annotLabels = {'train', 'valid'}
 annot,ref = {},{}
 for _,l in ipairs(annotLabels) do
     local a, namesFile
-    if opt.dataset == 'mpii' and l == 'valid' and opt.finalPredictions == 1 then
-        a = hdf5.open(opt.dataDir .. '/annot/test.h5')
-        namesFile = io.open(opt.dataDir .. '/annot/test_images.txt')
-    else
-        a = hdf5.open(opt.dataDir .. '/annot/' .. l .. '.h5')
-        namesFile = io.open(opt.dataDir .. '/annot/' .. l .. '_images.txt')
-    end
+    a = hdf5.open(opt.dataDir .. '/annot/' .. l .. '.h5')
     annot[l] = {}
 
     -- Read in annotation information
-    local tags = {'part', 'center', 'scale', 'zind'}
-    for _,tag in ipairs(tags) do annot[l][tag] = a:read(tag):all() end
+    annot[l]['part'] = a:read('part'):all()
+    annot[l]['center'] = a:read('center'):all()
+    annot[l]['scale'] = a:read('scale'):all()
+    annot[l]['zind'] = a:read('zind'):all()
     annot[l]['nsamples'] = annot[l]['part']:size()[1]
 
-    -- Load in image file names (reading strings wasn't working from hdf5)
-    annot[l]['images'] = {}
-    local toIdxs = {}
-    local idx = 1
-    for line in namesFile:lines() do
-        annot[l]['images'][idx] = line
-        if not toIdxs[line] then toIdxs[line] = {} end
-        table.insert(toIdxs[line], idx)
-        idx = idx + 1
+    -- local tags = {'part', 'center', 'scale', 'zind'}
+    -- for _,tag in ipairs(tags) do annot[l][tag] = a:read(tag):all() end
+
+    namesFile = io.open(opt.dataDir .. '/annot/' .. l .. '_' .. opt.source ..'.txt')
+    if opt.source == 'images' then
+       -- Load in image file names (reading strings wasn't working from hdf5)
+       annot[l]['images'] = {}
+       idx = 0
+       for line in namesFile:lines() do
+          annot[l]['images'][idx] = line
+          idx = idx + 1
+       end
+       -- Loading from videos
+    else
+       annot[l]['videos'] = {}
+       idx = 0
+       for line in namesFile:lines() do
+          annot[l]['videos'][idx] = line
+          idx = idx + 1
+       end
+       annot[l]['video_id'] = a:read('video_id'):all()
+       annot[l]['frame_id'] = a:read('frame_id'):all()
     end
     namesFile:close()
-
-    -- This allows us to reference multiple people who are in the same image
-    annot[l]['imageToIdxs'] = toIdxs
 
     -- Set up reference for training parameters
     ref[l] = {}
@@ -175,6 +181,14 @@ elseif opt.dataset == 'lsp' then
 elseif opt.dataset == 'h36m' then
     matchedParts = {
         {2,5}, {3,6}, {4,7}, {12,15}, {13,16}, {14,17}
+    }
+elseif opt.dataset == 'surreal' then
+    matchedParts = {
+       {1,   2}, {1,   3}, {1,   4}, {2,   5}, {3,   6},
+       {4,   7}, {5,   8}, {6,   9}, {7,  10}, {8,  11},
+       {9,  12}, {10, 13}, {10, 14}, {10, 15}, {13, 16},
+       {14, 17}, {15, 18}, {17, 19}, {18, 20}, {19, 21},
+       {20, 22}, {21, 23}, {22, 24}
     }
 end
 

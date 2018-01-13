@@ -3,6 +3,7 @@ predDim = {nParts,3}
 
 criterion = nn.ParallelCriterion()
 for i = 1,opt.nStack do criterion:add(nn.MSECriterion()) end
+paths.dofile('rvideo.lua')
 
 -- Code to generate training samples from raw images.
 function generateSample(set, idx)
@@ -10,7 +11,14 @@ function generateSample(set, idx)
     local c = annot[set]['center'][idx]
     local s = annot[set]['scale'][idx]
     local z = annot[set]['zind'][idx]
-    local img = image.load(opt.dataDir .. '/images/' .. annot[set]['images'][idx])
+    local img
+    if opt.source == 'images' then
+       img = image.load(opt.dataDir .. '/images/' .. annot[set]['images'][idx])
+    else
+       id_video = annot[set]['video_id'][idx]
+       id_frame = annot[set]['frame_id'][idx]
+       img = extractFrame(opt.dataDir '/' .. set .. '/' .. annot[set]['videos'][id_video], frame_id)
+    end
 
     -- For single-person pose estimation with a centered/scaled figure
     local inp = crop(img, c, s, 0, opt.inputRes)
@@ -42,6 +50,12 @@ function postprocess(set, idx, output)
 end
 
 function accuracy(output,label)
-    local jntIdxs = {mpii={1,2,3,4,5,6,11,12,15,16},flic={2,3,5,6,7,8},h36m={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}}
+   local jntIdxs = {
+      mpii={1,2,3,4,5,6,11,12,15,16},
+      flic={2,3,5,6,7,8},
+      h36m={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17},
+      surreal={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24}
+   }
+
     return heatmapAccuracy(output[#output],label[#label],nil,jntIdxs[opt.dataset])
 end
