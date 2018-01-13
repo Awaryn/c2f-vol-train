@@ -23,6 +23,10 @@ EXP_PATH="$PROJECT_DIR/$EXP_DIR"
 MODEL_PATH="$EXP_PATH/$DATASET/$TEST_NAME"
 COMPONENTS=$(($(echo $OUT_Z_RES | grep -o ',' | wc -l) + 1))
 
+if [ ! -d "$MODEL_PATH" ]; then
+    mkdir -p $MODEL_PATH
+fi
+
 echo "" > $LOG_PATH
 
 while [ 1 ]; do
