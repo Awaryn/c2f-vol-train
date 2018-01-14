@@ -1,13 +1,13 @@
 #!/bin/bash
 
-TEST_NAME=test-run-c2f
+TEST_NAME=surreal-run-c2f
 TOTAL_ITER=500
 TOTAL_EPOCH=5
 BATCH_SIZE=2
 
 EXP_DIR="exp"
 SRC_DIR="src"
-DATASET="h36m"
+DATASET="surreal"
 INPUT_RES="128"
 OUT_XY_RES="32"
 OUT_Z_RES="1,2,4,32"
@@ -18,6 +18,7 @@ cd $SRC_DIR
 
 LOG_PATH="../restarter.log"
 
+DATA_PATH="/media/remi/hdd/dataset"
 PROJECT_DIR=".."
 EXP_PATH="$PROJECT_DIR/$EXP_DIR"
 MODEL_PATH="$EXP_PATH/$DATASET/$TEST_NAME"
@@ -50,8 +51,12 @@ while [ 1 ]; do
     ARGS="$ARGS -trainBatch $BATCH_SIZE"
     ARGS="$ARGS -inputRes $INPUT_RES"
     ARGS="$ARGS -outputRes $OUT_XY_RES"
+    ARGS="$ARGS -dataDir $DATA_PATH"
+    ARGS="$ARGS -source videos"
+    ARGS="$ARGS -nThreads 1"
     ARGS="$ARGS $CONTINUE"
 
+    echo th main.lua $ARGS
     th main.lua $ARGS
     # exit
     # th main.lua -dataset h36m \
