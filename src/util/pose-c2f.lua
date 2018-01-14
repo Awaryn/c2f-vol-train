@@ -17,7 +17,7 @@ function generateSample(set, idx)
     else
        id_video = annot[set]['video_id'][idx]
        id_frame = annot[set]['frame_id'][idx]
-       img = extractFrame(opt.dataDir '/' .. set .. '/' .. annot[set]['videos'][id_video], frame_id)
+       img = extractFrame(opt.dataDir .. '/' .. set .. '/' .. annot[set]['videos'][id_video+1], id_frame)
     end
 
     -- For single-person pose estimation with a centered/scaled figure

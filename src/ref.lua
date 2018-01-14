@@ -118,12 +118,11 @@ for _,l in ipairs(annotLabels) do
 
     -- local tags = {'part', 'center', 'scale', 'zind'}
     -- for _,tag in ipairs(tags) do annot[l][tag] = a:read(tag):all() end
-
     namesFile = io.open(opt.dataDir .. '/annot/' .. l .. '_' .. opt.source ..'.txt')
     if opt.source == 'images' then
        -- Load in image file names (reading strings wasn't working from hdf5)
        annot[l]['images'] = {}
-       idx = 0
+       local idx = 1
        for line in namesFile:lines() do
           annot[l]['images'][idx] = line
           idx = idx + 1
@@ -131,7 +130,7 @@ for _,l in ipairs(annotLabels) do
        -- Loading from videos
     else
        annot[l]['videos'] = {}
-       idx = 0
+       local idx = 1
        for line in namesFile:lines() do
           annot[l]['videos'][idx] = line
           idx = idx + 1
