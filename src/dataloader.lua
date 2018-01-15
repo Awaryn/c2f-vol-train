@@ -64,7 +64,7 @@ function DataLoader:run()
          threads:addjob(
             function(indices)
                local idx_ = nil
-               if _G.isTesting then idx_ = idx end
+               -- if _G.isTesting then idx_ = idx end
                local inp,out = _G.loadData(_G.split, idx_, batchsize)
                collectgarbage()
                return {inp,out}
