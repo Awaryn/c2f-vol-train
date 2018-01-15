@@ -81,7 +81,7 @@ function loadData(set, idx, batchsize)
     end
 
     -- Augment data (during training only)
-    if not isTesting then
+    if opt.jitter == 1 and not isTesting then
         local s = torch.randn(batchsize):mul(opt.scaleFactor):add(1):clamp(1-opt.scaleFactor,1+opt.scaleFactor)
         local r = torch.randn(batchsize):mul(opt.rotFactor):clamp(-2*opt.rotFactor,2*opt.rotFactor)
 
